@@ -28,10 +28,8 @@
             <div class="flex-row">
 {{--Search bar--}}
                 <div class="h-40 flex justify-center items-center">
-                    <form class="w-3/4" onsubmit="return logJSONData()">
-                        <label class="text-white" for="searchBar">Search for a gif</label>
-                        <input id="searchBar" name="search_term" class="w-full h-10 rounded-lg p-2" type="text" placeholder="Search for a gif">
-                        <button id="searchButton" class="w-full h-10 rounded-lg p-2 bg-gray-500 text-white" type="submit">Search</button>
+                    <form class="w-3/4" id="searchForm" onsubmit="return false">
+                        <input id="searchBar" name="search_term" class="w-full h-10 rounded-lg p-2" type="text" placeholder="Search Tenor">
                     </form>
                 </div>
 {{--Loaded Gifs--}}

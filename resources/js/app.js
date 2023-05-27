@@ -1,5 +1,4 @@
 import './bootstrap';
-import {list} from "postcss";
 
 const form = document.getElementById('searchForm');
 form.addEventListener('submit', loadSearchGifsInitial);
@@ -8,25 +7,17 @@ let next = "";
 
 const apiKey = "AIzaSyBBWKWlLXhTl7r3nInPnAwbwuFRgDql4qo";
 const clientKey = "gifProject";
-let lmt = 25;
+let lmt = 50;
 
 const gifLoader = document.getElementById("gifLoader");
 const body = document.getElementsByTagName("body")[0];
 const column = 5;
-const divider = lmt / column;
 
-const urlParams = new URLSearchParams(window.location.search);
+let urlParams = new URLSearchParams(window.location.search);
 
 createGifRows();
 
 window.addEventListener("load", (event) => {
-    // if(urlParams.get('q') === "featured") {
-    //     loadFeaturedGifs();
-    // } else {
-    //     window.history.replaceState(null, null, "?q=" + urlParams.get('q'));
-    //     console.log(urlParams.get('q'))
-    //     loadSearchGifsInitial();
-    // }
     loadFeaturedGifs();
 });
 
@@ -40,7 +31,7 @@ async function loadSearchGifsInitial() {
     let search_url = "https://tenor.googleapis.com/v2/search?q=" + search_term + "&key=" +
         apiKey + "&client_key=" + clientKey + "&limit=" + lmt + "&pos=" + next;
 
-    window.history.replaceState(null, null, "?q=" + search_term);
+    window.history.replaceState('', '', "?q=" + search_term);
 
 
 
@@ -71,10 +62,9 @@ async function loadSearchGifs() {
 }
 
 async function loadFeaturedGifs(){
-    // lmt = 25;
     const featured_url = "https://tenor.googleapis.com/v2/featured?key=" + apiKey + "&client_key=" + clientKey + "&limit=" + lmt + "&pos=" + next;
 
-    window.history.pushState("", "", "?q=" + "featured");
+    window.history.replaceState("", "", "?q=" + "featured");
 
     const response = await fetch(featured_url)
     const jsonData = await response.json();
@@ -83,6 +73,7 @@ async function loadFeaturedGifs(){
 
     next = jsonData["next"];
 
+    console.log(next)
     createGifs(gifs)
 }
 
@@ -120,12 +111,17 @@ function createGifs(gifs) {
         gifImage.height = 164;
         gifImage.className = "rounded-md border-2 border-transparent hover:border-white";
 
-        if (count + 1> divider) {count = 0}
-
+        if (count > column-1) {
+            count = 0
+            console.log('reset')
+        }
+        console.log(i);
+        console.log(document.querySelectorAll("#gifRow")[count]);
         document.querySelectorAll("#gifRow")[count].appendChild(gifContainer);
         gifContainer.appendChild(gifImage);
 
         count++;
+        console.log(count)
 
         gifContainer.addEventListener('click', function () {
 
@@ -150,6 +146,7 @@ function createGifs(gifs) {
 }
 
 const handleInfiniteScroll = () => {
+    urlParams = new URLSearchParams(window.location.search);
     const endOfPage = window.innerHeight + window.pageYOffset >= document.body.offsetHeight;
     if (endOfPage) {
         console.log(urlParams.get('q'))
@@ -165,3 +162,6 @@ const handleInfiniteScroll = () => {
 
 
 window.addEventListener("scroll", handleInfiniteScroll);
+window.addEventListener("scroll", function () {
+    console.log(urlParams.get('q'));
+});

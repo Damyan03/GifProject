@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -24,7 +24,7 @@
     </div>
 {{--Content--}}
     <div class="bg-gray-800 w-full h-full">
-        <div class="bg-gray-700 m-auto w-3/4 h-full">
+        <div class="bg-gray-700 m-auto w-5/6 h-full">
             <div class="flex-row">
 {{--Search bar--}}
                 <div class="h-40 flex justify-center items-center">
@@ -33,11 +33,14 @@
                     </form>
                 </div>
 {{--Loaded Gifs--}}
-                <div id="gifLoader" class="flex flex-row flex-wrap flex-grow gap-4 items-start justify-center w-full p-5     m-auto">
+                <div id="gifLoader" class="flex flex-row flex-wrap flex-grow gap-4 items-start justify-center w-full p-5 ms-auto">
 {{--Gifs--}}
                 </div>
             </div>
         </div>
     </div>
+<div id="enlargeContainer">
+    <div id="backgroundDim" class="fixed top-0 left-0 w-full h-full bg-black opacity-50 z-10 invisible"></div>
+</div>
 </body>
 </html>

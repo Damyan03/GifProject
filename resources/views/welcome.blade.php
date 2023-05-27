@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="h-full overflow-hidden">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -33,7 +33,7 @@
                     </form>
                 </div>
 {{--Loaded Gifs--}}
-                <div id="gifLoader" class="grid grid-cols-5 gap-4 items-center w-full p-5 m-auto">
+                <div id="gifLoader" class="flex flex-row flex-wrap flex-grow gap-4 items-start justify-center w-full p-5     m-auto">
 {{--Gifs--}}
                 </div>
             </div>

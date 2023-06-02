@@ -1,33 +1,39 @@
-import './bootstrap';
-
-const form = document.getElementById('searchForm');
-form.addEventListener('submit', loadSearchGifsInitial);
-
 let next = "";
 
-const apiKey = JSON.parse(document.getElementById('world-map').dataset.maps);
+const apiKey = 'AIzaSyAi-yrQp7mZDSc29iHCukccaLzMnaHE9Qo';
 
 const clientKey = "gifProject";
 let lmt = 50;
 
-const gifLoader = document.getElementById("gifLoader");
 const column = 5;
 
 let urlParams = new URLSearchParams(window.location.search);
 const searchContainer = document.getElementById("searchContainer")
 
-createGifRows();
-
 window.addEventListener("load", (() => {
+    window.addEventListener("scroll", handleInfiniteScroll);
+
+    const  gifLoader = document.getElementById("gifLoader");
+
+    const form = document.getElementById('searchForm');
+    form.addEventListener('submit', loadSearchGifsInitial);
+
+    document.getElementById('searchBar').addEventListener('input', function () {
+        loadSuggestions().then(() => console.log("Suggestions Loaded"));
+    });
+
+    for (let i = 0; i < column; i++) {
+        const gifRow = document.createElement("div");
+        gifRow.id = "gifRow";
+        gifRow.className = "flex flex-col flex-wrap items-start gap-4";
+        gifLoader.appendChild(gifRow);
+    }
     loadFeaturedGifs().then(() => console.log("Featured Gifs Loaded"));
     loadTrendingSuggestion().then(() => console.log("Trending Suggestions Loaded"));
 }));
 
-document.getElementById('searchBar').addEventListener('input', function () {
-    loadSuggestions().then(() => console.log("Suggestions Loaded"));
-});
-
 async function loadSuggestions(){
+    const searchContainer = document.getElementById('searchContainer');
     while (searchContainer.firstChild) {
         searchContainer.removeChild(searchContainer.firstChild);
     }
@@ -44,7 +50,7 @@ async function loadSuggestions(){
     createSuggestions(suggestions)
 }
 async function loadTrendingSuggestion(){
-
+    const searchContainer = document.getElementById('searchContainer');
     while (searchContainer.firstChild) {
         searchContainer.removeChild(searchContainer.firstChild);
     }
@@ -61,6 +67,7 @@ async function loadTrendingSuggestion(){
 }
 
 function createSuggestions(suggestions){
+    const searchContainer = document.getElementById('searchContainer');
     for (let i = 0; i < suggestions.length; i++) {
         const suggestionContainer = document.createElement("div");
         suggestionContainer.id = "suggestionContainer";
@@ -95,7 +102,7 @@ async function loadSearchGifsInitial() {
     clearGifs();
 
     let search_url = "https://tenor.googleapis.com/v2/search?q=" + search_term + "&key=" +
-        apiKey + "&client_key=" + clientKey + "&limit=" + lmt + "&pos=" + next;
+        apiKey + "&client_key=" + clientKey + "&limit=" + lmt + "&media_filter=gif,nanogif,nanomp4" + "&pos=" + next;
 
     window.history.replaceState('', '', "?q=" + search_term);
 
@@ -105,15 +112,15 @@ async function loadSearchGifsInitial() {
     let gifs = jsonData["results"];
 
     next = jsonData["next"];
+    console.log(gifs)
 
     createGifs(gifs);
 }
-
 async function loadSearchGifs() {
     lmt = 50;
 
     let search_url = "https://tenor.googleapis.com/v2/search?q=" + urlParams.get('q') + "&key=" +
-        apiKey + "&client_key=" + clientKey + "&limit=" + lmt + "&pos=" + next;
+        apiKey + "&client_key=" + clientKey + "&limit=" + lmt + "&media_filter=gif,nanogif,nanomp4" + "&pos=" + next;
 
     const response = await fetch(search_url)
     const jsonData = await response.json();
@@ -127,9 +134,10 @@ async function loadSearchGifs() {
 }
 
 async function loadFeaturedGifs(){
+    event.preventDefault();
     lmt = 50;
 
-    const featured_url = "https://tenor.googleapis.com/v2/featured?key=" + apiKey + "&client_key=" + clientKey + "&limit=" + lmt + "&pos=" + next;
+    const featured_url = "https://tenor.googleapis.com/v2/featured?key=" + apiKey + "&client_key=" + clientKey + "&limit=" + lmt + "&media_filter=gif,nanogif,nanomp4" + "&pos=" + next;
 
     window.history.replaceState("", "", "?q=" + "featured");
 
@@ -143,25 +151,18 @@ async function loadFeaturedGifs(){
     console.log(gifs)
     createGifs(gifs)
 }
-
-function createGifRows() {
-    for (let i = 0; i < column; i++) {
-        const gifRow = document.createElement("div");
-        gifRow.id = "gifRow";
-        gifRow.className = "flex flex-col flex-wrap items-start gap-4";
-        gifLoader.appendChild(gifRow);
-    }
-}
-
-
-function clearGifs() {
-    const gifRows = document.querySelectorAll("#gifRow");
-    gifRows.forEach(function (gifRow) {
-        while (gifRow.firstChild) {
-            gifRow.removeChild(gifRow.firstChild);
+const handleInfiniteScroll = () => {
+    urlParams = new URLSearchParams(window.location.search);
+    const endOfPage = window.innerHeight + window.scrollY >= document.body.offsetHeight;
+    if (endOfPage) {
+    console.log('what');
+        if(urlParams.get('q') === "featured") {
+            loadFeaturedGifs().then(() => console.log("loadFeaturedGifs at handleInfiniteScroll"));
+        } else {
+            loadSearchGifs().then(() => console.log("loadSearchGifs at handleInfiniteScroll"));
         }
-    });
-}
+    }
+};
 
 function createGifs(gifs) {
     let count = 0;
@@ -251,7 +252,6 @@ function createGifs(gifs) {
             const linkContainer = document.createElement("div");
             linkContainer.id = "linkContainer";
             linkContainer.className = "h-10 w-1/2 flex flex-row rounded-md bg-gray-900";
-            console.log(linkContainer);
             enlargeContainerInfoContainer.appendChild(linkContainer);
             {
                 const copyLinkContainer = document.createElement("div");
@@ -327,17 +327,13 @@ function createGifs(gifs) {
     }
 }
 
-const handleInfiniteScroll = () => {
-    urlParams = new URLSearchParams(window.location.search);
-    const endOfPage = window.innerHeight + window.scrollY >= document.body.offsetHeight;
-    if (endOfPage) {
-        if(urlParams.get('q') === "featured") {
-            loadFeaturedGifs().then(() => console.log("loadFeaturedGifs at handleInfiniteScroll"));
-        } else {
-            loadSearchGifs().then(() => console.log("loadSearchGifs at handleInfiniteScroll"));
+function clearGifs() {
+    const gifRows = document.querySelectorAll("#gifRow");
+    gifRows.forEach(function (gifRow) {
+        while (gifRow.firstChild) {
+            gifRow.removeChild(gifRow.firstChild);
         }
-    }
-};
+    });
+}
 
 
-window.addEventListener("scroll", handleInfiniteScroll);

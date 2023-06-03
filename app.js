@@ -1,14 +1,9 @@
-let next = "";
-
 const apiKey = 'AIzaSyAi-yrQp7mZDSc29iHCukccaLzMnaHE9Qo';
-
 const clientKey = "gifProject";
 let lmt = 50;
+let next = "";
 
 const column = 5;
-
-let urlParams = new URLSearchParams(window.location.search);
-const searchContainer = document.getElementById("searchContainer")
 
 window.addEventListener("load", (() => {
     window.addEventListener("scroll", handleInfiniteScroll);
@@ -23,10 +18,10 @@ window.addEventListener("load", (() => {
     });
 
     for (let i = 0; i < column; i++) {
-        const gifRow = document.createElement("div");
-        gifRow.id = "gifRow";
-        gifRow.className = "flex flex-col flex-wrap items-start gap-4";
-        gifLoader.appendChild(gifRow);
+        const gifCol = document.createElement("div");
+        gifCol.id = "gifCol";
+        gifCol.className = "flex flex-col flex-wrap items-start gap-4";
+        gifLoader.appendChild(gifCol);
     }
     loadFeaturedGifs().then(() => console.log("Featured Gifs Loaded"));
     loadTrendingSuggestion().then(() => console.log("Trending Suggestions Loaded"));
@@ -134,7 +129,6 @@ async function loadSearchGifs() {
 }
 
 async function loadFeaturedGifs(){
-    event.preventDefault();
     lmt = 50;
 
     const featured_url = "https://tenor.googleapis.com/v2/featured?key=" + apiKey + "&client_key=" + clientKey + "&limit=" + lmt + "&media_filter=gif,nanogif,nanomp4" + "&pos=" + next;
@@ -165,7 +159,7 @@ const handleInfiniteScroll = () => {
 };
 
 function createGifs(gifs) {
-    let count = 0;
+    let curCol = 0;
 
     for (let i = 0; i < gifs.length; i++) {
         const gifContainer = document.createElement("div");
@@ -179,13 +173,13 @@ function createGifs(gifs) {
         gifImage.height = 164;
         gifImage.className = "rounded-md border-2 border-transparent hover:border-white";
 
-        if (count > column-1) {
-            count = 0
+        if (curCol >= column) {
+            curCol = 0
         }
-        document.querySelectorAll("#gifRow")[count].appendChild(gifContainer);
+        document.querySelectorAll("#gifCol")[curCol].appendChild(gifContainer);
         gifContainer.appendChild(gifImage);
 
-        count++;
+        curCol++;
 
         const enlargeContainer = document.getElementById('enlargeContainer')
         gifContainer.addEventListener('click', function () {
@@ -241,7 +235,7 @@ function createGifs(gifs) {
                     gifTag.innerHTML = gifs[i]["tags"][j];
                     gifTagSpecificContainer.appendChild(gifTag);
 
-                    gifTagSpecificContainer.addEventListener("click", function (){
+                    gifTagSpecificContainer.addEventListener("click", function () {
                         window.history.replaceState("", "", "?q=" + gifs[i]["tags"][j]);
                         document.getElementById('searchBar').value = gifs[i]["tags"][j];
                         loadSearchGifsInitial();
@@ -302,7 +296,7 @@ function createGifs(gifs) {
                                 detailsSpecific.innerHTML = `Duration: ${gifs[i]["media_formats"]["nanomp4"]["duration"]} seconds`;
                                 break;
                             case 1:
-                                detailsSpecific.innerHTML = `Width: ${gifs[i]["media_formats"]["gif"]["dims"]["0"]}x${gifs[i]["media_formats"]["gif"]["dims"]["1"]}`;
+                                detailsSpecific.innerHTML = `Dimensions ${gifs[i]["media_formats"]["gif"]["dims"]["0"]}x${gifs[i]["media_formats"]["gif"]["dims"]["1"]}`;
                                 break;
                             case 2:
                                 detailsSpecific.innerHTML = `Size: ${Math.round(gifs[i]["media_formats"]["gif"]["size"]/1024)}KB`;
@@ -328,10 +322,10 @@ function createGifs(gifs) {
 }
 
 function clearGifs() {
-    const gifRows = document.querySelectorAll("#gifRow");
-    gifRows.forEach(function (gifRow) {
-        while (gifRow.firstChild) {
-            gifRow.removeChild(gifRow.firstChild);
+    const gifCols = document.querySelectorAll("#gifCol");
+    gifCols.forEach(function (gifCol) {
+        while (gifCol.firstChild) {
+            gifCol.removeChild(gifCol.firstChild);
         }
     });
 }
